@@ -14,7 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false, of = "nomBatiment")
 @ToString(callSuper = true, of = {"nomBatiment", "estActif", "typeBatiment"})
-public class Batiment extends AbstractEntity implements Serializable {
+public class Batiment extends AbstractEntity {
 
     @Getter
     @Setter(AccessLevel.PROTECTED)
@@ -36,9 +36,4 @@ public class Batiment extends AbstractEntity implements Serializable {
     @Column(name = "typeBatiment", nullable = false, length = 50)
     private TypeBat typeBatiment;
 
-
-    @Override
-    public String displayable() {
-        return "Bâtiment : " + nomBatiment;
-    }
 }

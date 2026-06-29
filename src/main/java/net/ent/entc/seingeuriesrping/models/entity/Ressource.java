@@ -14,7 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false, of = "nomRessource")
 @ToString(callSuper = true, of = {"nomRessource", "typeRessource"})
-public class Ressource extends AbstractEntity implements Serializable {
+public class Ressource extends AbstractEntity{
 
     @Getter
     @Setter(AccessLevel.PROTECTED)
@@ -30,9 +30,4 @@ public class Ressource extends AbstractEntity implements Serializable {
     @Column(name = "typeRessource", nullable = false, length = 50)
     private TypeRessource typeRessource;
 
-
-    @Override
-    public String displayable() {
-        return "Ressource : " + nomRessource;
-    }
 }

@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.io.Serializable;
 import java.util.*;
 
 @Entity
@@ -15,8 +14,7 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false, of = "nom")
 @ToString(callSuper = true, of = {"nom", "seigneur"})
-
-public class Seigneurie extends AbstractEntity implements Serializable {
+public class Seigneurie extends AbstractEntity {
 
     @Getter
     @Setter(AccessLevel.PROTECTED)
@@ -26,19 +24,40 @@ public class Seigneurie extends AbstractEntity implements Serializable {
     private String nom;
 
     @Getter
-    @Setter(AccessLevel.PROTECTED)
+    @Setter
     @NotNull(message = "La seigneurie doit avoir un seigneur")
     @Valid
-    @OneToOne(optional = false)
-    @JoinColumn(name = "seigneur_id", nullable = false, foreignKey = @ForeignKey(name = "fk___seigneurie___seigneur"))
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinTable(name = "seigneurie_habitant"
+        ,joinColumns = @JoinColumn(name = "idSeigneurie", foreignKey = @ForeignKey(name = "fk___seigneurie_habitant___id_seigneurie"))
+        , inverseJoinColumns = @JoinColumn(name = "idHabitant", foreignKey = @ForeignKey(name = "fk___seigneurie_habitant___id_habitant"))
+    )
     private Habitant seigneur;
 
     @Valid
-    @OneToMany
-    private Set<Habitant> habitants = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idSeigneurie", foreignKey = @ForeignKey(name = "fk___seigneurie___habitant"))
+    private List<Habitant> habitants = new ArrayList<>();
 
-    public Set<Habitant> getHabitants() {
-        return Collections.unmodifiableSet(habitants);
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idSeigneurie", foreignKey = @ForeignKey(name = "fk____seigneurie___batiments"))
+    private List<Batiment> batiments = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "seigneurie_evenement",
+            joinColumns = @JoinColumn(name = "idSeigneurie", foreignKey = @ForeignKey(name = "fk___seigneurie_evenement___seigneurie")),
+            inverseJoinColumns = @JoinColumn(name = "idEvenement", foreignKey = @ForeignKey(name = "fk___seigneurie_evenement___evenement")))
+    private Set<Evenement> evenements = new HashSet<>();
+
+    @Getter
+    @ElementCollection
+    @CollectionTable(name = "seigneurie_ressource", joinColumns = @JoinColumn(name = "seigneurie_id"), foreignKey = @ForeignKey(name = "fk___seigneurie_ressource___seigneurie_id"))
+    @MapKeyJoinColumn(name = "idRessource", foreignKey = @ForeignKey(name = "fk___seigneurie_ressource___ressource"))
+    @Column(name = "quantite", nullable = false)
+    private Map<Ressource, Integer> ressources = new HashMap<>();
+
+    public List<Habitant> getHabitants() {
+        return Collections.unmodifiableList(habitants);
     }
 
     public void addHabitant(@NotNull Habitant habitant) {
@@ -48,9 +67,6 @@ public class Seigneurie extends AbstractEntity implements Serializable {
     public void removeHabitant(@NotNull Habitant habitant) {
         habitants.remove(habitant);
     }
-
-    @OneToMany()
-    private List<Batiment> batiments = new ArrayList<>();
 
     public List<Batiment> getBatiments() {
         return Collections.unmodifiableList(batiments);
@@ -64,9 +80,6 @@ public class Seigneurie extends AbstractEntity implements Serializable {
         batiments.remove(batiment);
     }
 
-    @OneToMany
-    private Set<Evenement> evenements = new HashSet<>();
-
     public Set<Evenement> getEvenements() {
         return Collections.unmodifiableSet(evenements);
     }
@@ -78,13 +91,6 @@ public class Seigneurie extends AbstractEntity implements Serializable {
     public void removeEvenement(@NotNull Evenement evenement) {
         evenements.remove(evenement);
     }
-
-    @Getter
-    @ElementCollection
-    @CollectionTable(name = "seigneurie_ressource", joinColumns = @JoinColumn(name = "seigneurie_id"), foreignKey = @ForeignKey(name = "fk___seigneurie_ressource___seigneurie"))
-    @MapKeyJoinColumn(name = "idRessource", foreignKey = @ForeignKey(name = "fk___seigneurie_ressource___ressource"))
-    @Column(name = "quantite", nullable = false)
-    private Map<Ressource, Integer> ressources = new HashMap<>();
 
     public void addRessource(@NotNull Ressource ressource, @NotNull Integer quantite) {
         ressources.merge(ressource, quantite, Integer::sum);
@@ -101,13 +107,4 @@ public class Seigneurie extends AbstractEntity implements Serializable {
         }
     }
 
-    protected Seigneurie(String nom, Habitant seigneur) {
-        this.nom = nom;
-        this.seigneur = seigneur;
-    }
-
-    @Override
-    public String displayable() {
-        return "Seigneurie : " + nom;
-    }
 }

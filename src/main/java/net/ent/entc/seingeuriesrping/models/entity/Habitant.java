@@ -12,11 +12,11 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "habitant", uniqueConstraints = @UniqueConstraint(name = "uk___habitant___nom_prenom", columnNames = {"nom", "prenom"}))
+@Table(name = "habitant", uniqueConstraints = @UniqueConstraint(name = "uk___habitant___nom__prenom", columnNames = {"nomHabitant", "prenomHabitant"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false, of = {"nomHabitant", "prenomHabitant", "dateNaissance"})
-@ToString(callSuper = true, of = {"nomHabitant", "prenomHabitant", "dateNaissance", "statut"})
-public class Habitant extends AbstractEntity implements Serializable {
+@ToString(callSuper = true, of = {"nomHabitant", "prenomHabitant", "dateNaissance", "statutHabitant"})
+public class Habitant extends AbstractEntity{
 
     @Getter
     @Setter(AccessLevel.PROTECTED)
@@ -46,8 +46,4 @@ public class Habitant extends AbstractEntity implements Serializable {
     @Column(name = "statutHabitant", nullable = false, length = 50)
     private StatutHabitant statutHabitant;
 
-    @Override
-    public String displayable() {
-        return "Habitant : " + nomHabitant + " " + prenomHabitant;
-    }
 }

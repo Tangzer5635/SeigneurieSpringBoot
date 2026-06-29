@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "evenement", uniqueConstraints = @UniqueConstraint(name = "uk___evenement___nom", columnNames = {"nomEvenement"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(callSuper = false, of = {"nomEvenement", "dateDebutEvenement"})
+@EqualsAndHashCode(callSuper = false, of = {"nomEvenement", "dateDebut"})
 @ToString(callSuper = true, of = {"nomEvenement", "descriptionEvenement", "dateDebut", "dateFin", "typeEvenement"})
-public class Evenement extends AbstractEntity implements Serializable {
+public class Evenement extends AbstractEntity{
 
     @Getter
     @Setter(AccessLevel.PROTECTED)
@@ -50,10 +50,4 @@ public class Evenement extends AbstractEntity implements Serializable {
     @Column(name = "typeEvenement", nullable = false, length = 50)
     private TypeEvenement typeEvenement;
 
-
-
-    @Override
-    public String displayable() {
-        return "Événement : " + nomEvenement;
-    }
 }
