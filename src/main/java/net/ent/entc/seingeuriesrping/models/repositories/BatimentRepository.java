@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-interface BatimentRepository extends JpaRepository<Batiment,Long> {
+public interface BatimentRepository extends JpaRepository<Batiment,Long> {
 
     Optional<Batiment> findByNomBatiment(String nomBatiment);
 
