@@ -1,0 +1,6 @@
+id;date_creation;nom;description;date_debut;date_fin;type_batiment
+1;2026-06-29T10:00:00;Fête des moissons;Célébration après la récolte;2026-07-12T10:00:00;2026-07-12T22:00:00;FETE
+2;2026-06-29T10:00:00;Patrouille de frontière;Renforcement des chemins de garde;2026-07-20T06:00:00;2026-07-20T18:00:00;GUERRE
+3;2026-06-29T10:00:00;Semaine de beau temps;Période favorable aux travaux des champs;2026-08-01T08:00:00;2026-08-07T20:00:00;BEAU_TEMPS
+4;2026-06-29T10:00:00;Crainte de famine;Réserves de grain sous surveillance;2026-09-03T09:00:00;2026-09-10T18:00:00;FAMINE
+5;2026-06-29T10:00:00;Maladie au hameau;Quelques habitants placés à l’écart;2026-10-15T07:00:00;2026-10-22T19:00:00;EPIDEMIE

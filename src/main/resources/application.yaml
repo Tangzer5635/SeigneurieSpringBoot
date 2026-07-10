@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: seigneurieSpring
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/db_seigneurie
+    username: postgres
+    password: azerty+35
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true

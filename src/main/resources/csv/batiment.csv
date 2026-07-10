@@ -1,0 +1,16 @@
+id;date_creation;nom;est_actif;type;seigneurie_id
+1;2026-06-29T10:00:00;Château de Montfaucon;True;CHATEAU;1
+2;2026-06-29T10:00:00;Ferme basse de Montfaucon;True;FERME;1
+3;2026-06-29T10:00:00;Maisons du bourg de Montfaucon;True;MAISON;1
+4;2026-06-29T10:00:00;Caserne de Montfaucon;True;CASERNE;1
+5;2026-06-29T10:00:00;Ferme haute de Montfaucon;True;FERME;1
+6;2026-06-29T10:00:00;Château de Valbrume;True;CHATEAU;2
+7;2026-06-29T10:00:00;Ferme basse de Valbrume;True;FERME;2
+8;2026-06-29T10:00:00;Maisons du bourg de Valbrume;True;MAISON;2
+9;2026-06-29T10:00:00;Caserne de Valbrume;True;CASERNE;2
+10;2026-06-29T10:00:00;Ferme haute de Valbrume;True;FERME;2
+11;2026-06-29T10:00:00;Château de Rochebois;True;CHATEAU;3
+12;2026-06-29T10:00:00;Ferme basse de Rochebois;True;FERME;3
+13;2026-06-29T10:00:00;Maisons du bourg de Rochebois;True;MAISON;3
+14;2026-06-29T10:00:00;Caserne de Rochebois;True;CASERNE;3
+15;2026-06-29T10:00:00;Ferme haute de Rochebois;True;FERME;3
