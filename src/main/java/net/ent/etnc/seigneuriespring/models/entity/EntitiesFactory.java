@@ -3,6 +3,8 @@ package net.ent.etnc.seigneuriespring.models.entity;
 import lombok.NoArgsConstructor;
 import net.ent.etnc.seigneuriespring.models.entity.communs.ValidUtils;
 import net.ent.etnc.seigneuriespring.models.entity.communs.exceptions.ValidException;
+import net.ent.etnc.seigneuriespring.models.entity.vobjects.Nom;
+import net.ent.etnc.seigneuriespring.models.entity.vobjects.Prenom;
 import net.ent.etnc.seigneuriespring.models.referencies.StatutHabitant;
 import net.ent.etnc.seigneuriespring.models.referencies.TypeBat;
 import net.ent.etnc.seigneuriespring.models.referencies.TypeEvenement;
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class EntitiesFactory {
-    public static Batiment creerBatiment(String nom, boolean actif, TypeBat type) throws ValidException {
+    public static Batiment creerBatiment(Nom nom, boolean actif, TypeBat type) throws ValidException {
         Batiment b = new Batiment();
         b.setNom(nom);
         b.setEstActif(actif);
@@ -22,7 +24,7 @@ public class EntitiesFactory {
         return b;
     }
 
-    public static Evenement creerEvenement(String nom, String description, LocalDateTime dateDebut, LocalDateTime dateFin, TypeEvenement type) throws ValidException {
+    public static Evenement creerEvenement(Nom nom, String description, LocalDateTime dateDebut, LocalDateTime dateFin, TypeEvenement type) throws ValidException {
         Evenement e = new Evenement();
         e.setNom(nom);
         e.setDescription(description);
@@ -33,7 +35,7 @@ public class EntitiesFactory {
         return e;
     }
 
-    public static Habitant creerHabitant(String nom, String prenom, LocalDate dateNaissance, StatutHabitant statut) throws ValidException {
+    public static Habitant creerHabitant(Nom nom, Prenom prenom, LocalDate dateNaissance, StatutHabitant statut) throws ValidException {
         Habitant h = new Habitant();
         h.setNom(nom);
         h.setPrenom(prenom);

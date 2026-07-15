@@ -1,10 +1,9 @@
 package net.ent.etnc.seigneuriespring.models.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
+import net.ent.etnc.seigneuriespring.models.entity.vobjects.Nom;
 import net.ent.etnc.seigneuriespring.models.referencies.TypeBat;
 
 @Entity
@@ -14,15 +13,10 @@ import net.ent.etnc.seigneuriespring.models.referencies.TypeBat;
 @ToString(callSuper = true, of = {"nom", "estActif", "type"})
 public class Batiment extends AbstractEntity {
 
-    //LBK
     @Getter
     @Setter(AccessLevel.PROTECTED)
-    //BV
-    @NotBlank(message = "le nom ne doit pas être vide")
-    @Size(max = 50, message = "le nom ne doit pas dépasser 50 caractères")
-    //JPA
-    @Column(name = "nom", unique = true, nullable = false, length = 50)
-    private String nom;
+    @Embedded
+    private Nom nom;
     //LBK
     @Getter
     @Setter

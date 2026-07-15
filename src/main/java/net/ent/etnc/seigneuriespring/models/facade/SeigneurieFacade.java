@@ -5,6 +5,8 @@ import net.ent.etnc.seigneuriespring.models.facade.dto.BatimentDTO;
 import net.ent.etnc.seigneuriespring.models.facade.dto.SeigneurieDTO;
 import net.ent.etnc.seigneuriespring.models.facade.exception.FacadeMetierException;
 
+import java.util.List;
+
 public interface SeigneurieFacade {
     Seigneurie creerSeigneurie(SeigneurieDTO seigneurieDTO) throws FacadeMetierException;
 
@@ -21,4 +23,6 @@ public interface SeigneurieFacade {
     void ajouterRessourcesSeigneurie(Long[][] ressources, Long idSeigneurie) throws FacadeMetierException;
 
     void echangeRessourcesEntreSeigneurie(Long idSeigneurieEmettrice, Long idSeigneurieReceptrice, Long[][] ressources) throws FacadeMetierException;
+
+    List<Seigneurie> recupererToutesLesSeigneuries() throws FacadeMetierException;
 }

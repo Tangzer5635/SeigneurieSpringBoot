@@ -2,6 +2,11 @@ spring:
   application:
     name: seigneurieSpring
 
+  shell:
+    interactive:
+      enabled: true
+
+
   datasource:
     url: jdbc:postgresql://localhost:5432/db_seigneurie
     username: postgres

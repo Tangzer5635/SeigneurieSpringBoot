@@ -5,6 +5,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.ent.etnc.seigneuriespring.models.entity.*;
 import net.ent.etnc.seigneuriespring.models.entity.communs.exceptions.ValidException;
+import net.ent.etnc.seigneuriespring.models.entity.vobjects.Nom;
+import net.ent.etnc.seigneuriespring.models.entity.vobjects.Prenom;
 import net.ent.etnc.seigneuriespring.models.facade.InitFacade;
 import net.ent.etnc.seigneuriespring.models.facade.exception.FacadeMetierException;
 import net.ent.etnc.seigneuriespring.models.referencies.StatutHabitant;
@@ -81,8 +83,8 @@ public class InitFacadeImpl implements InitFacade {
         for (String line : lignes) {
             String[] data = line.split(";");
             Habitant hab = EntitiesFactory.creerHabitant(
-                    data[2],
-                    data[3],
+                    new Nom(data[2]),
+                    new Prenom(data[3]),
                     LocalDate.parse(data[4]),
                     StatutHabitant.valueOf(data[5]));
             habitantService.save(hab);
@@ -105,7 +107,7 @@ public class InitFacadeImpl implements InitFacade {
         for (String line : lignes) {
             String[] data = line.split(";");
             Evenement evt = EntitiesFactory.creerEvenement(
-                    data[2],
+                    new Nom(data[2]),
                     data[3],
                     LocalDateTime.parse(data[4]),
                     LocalDateTime.parse(data[5]),
@@ -132,7 +134,7 @@ public class InitFacadeImpl implements InitFacade {
             Seigneurie seigneurie = seigneurieService.findByIdFetchBatiment(Long.parseLong(data[5]));
 
             Batiment batiment = EntitiesFactory.creerBatiment(
-                    data[2],
+                    new Nom(data[2]),
                     Boolean.parseBoolean(data[3]),
                     TypeBat.valueOf(data[4]));
 

@@ -3,8 +3,8 @@ package net.ent.etnc.seigneuriespring.models.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
+import net.ent.etnc.seigneuriespring.models.entity.vobjects.Nom;
 import net.ent.etnc.seigneuriespring.models.referencies.TypeEvenement;
 
 import java.time.LocalDateTime;
@@ -15,15 +15,10 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false, of = {"nom", "dateDebut"})
 @ToString(callSuper = true, of = {"nom", "description", "dateDebut", "dateFin", "type"})
 public class Evenement extends AbstractEntity {
-    //LBK
     @Getter
     @Setter(AccessLevel.PROTECTED)
-    //BV
-    @NotBlank(message = "Le nom ne doit pas être vide")
-    @Size(max = 50)
-    //JPA
-    @Column(name = "nom", nullable = false, length = 50)
-    private String nom;
+    @Embedded
+    private Nom nom;
     //LBK
     @Getter
     @Setter

@@ -13,7 +13,7 @@ import java.util.*;
 @Table(name = "seigneurie", uniqueConstraints = @UniqueConstraint(name = "uk___seigneurie___nom", columnNames = {"nom"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false, of = "nom")
-@ToString(callSuper = true, of = {"nom", "seigneur", "ressources", "habitants", "batiments"})
+@ToString(callSuper = true, of = {"nom", "seigneur"})
 public class Seigneurie extends AbstractEntity {
 
 

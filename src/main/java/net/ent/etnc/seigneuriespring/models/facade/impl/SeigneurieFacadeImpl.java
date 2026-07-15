@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.ent.etnc.seigneuriespring.models.entity.*;
 import net.ent.etnc.seigneuriespring.models.entity.communs.exceptions.ValidException;
+import net.ent.etnc.seigneuriespring.models.entity.vobjects.Nom;
 import net.ent.etnc.seigneuriespring.models.facade.SeigneurieFacade;
 import net.ent.etnc.seigneuriespring.models.facade.dto.BatimentDTO;
 import net.ent.etnc.seigneuriespring.models.facade.dto.SeigneurieDTO;
@@ -88,7 +89,7 @@ public class SeigneurieFacadeImpl implements SeigneurieFacade {
 
             // 1. créer bâtiment avec DTO
             Batiment batiment = EntitiesFactory.creerBatiment(
-                    batimentDTO.nom(),
+                    new Nom(batimentDTO.nom()),
                     batimentDTO.isActif(),
                     TypeBat.valueOf(batimentDTO.typeBatiment()));
             // 2. save batiment
@@ -127,9 +128,14 @@ public class SeigneurieFacadeImpl implements SeigneurieFacade {
      */
 
     @Override
+    @Transactional
     public Seigneurie renouvelerPopulationSeigneurie(Long idSeigneurie) throws FacadeMetierException {
         try {
             Seigneurie seigneurie = seigneurieService.findById(idSeigneurie);
+
+            if (seigneurie == null) {
+                throw new FacadeMetierException("La seigneurie avec l'ID " + idSeigneurie + " n'existe pas");
+            }
 
             Set<Habitant> lesHabitantSeigneurie = seigneurie.getHabitants();
             if (lesHabitantSeigneurie.isEmpty())
@@ -149,7 +155,6 @@ public class SeigneurieFacadeImpl implements SeigneurieFacade {
             for (Habitant h : habitantSelectionne) {
                 habitantService.deleteById(h.getId());
             }
-
 
             // Ajouter le double de n nouveaux jeunes habitants
             for (int i = 0; i < nbPersonne * 2; i++) {
@@ -247,5 +252,15 @@ public class SeigneurieFacadeImpl implements SeigneurieFacade {
             throw new FacadeMetierException("Erreur conversion quantité ressource", e);
         }
     }
+
+    @Override
+    public List<Seigneurie> recupererToutesLesSeigneuries() throws FacadeMetierException {
+        try {
+            return seigneurieService.getAll();
+        } catch (ServiceException e) {
+            throw new FacadeMetierException(e.getMessage());
+        }
+    }
+
 
 }
