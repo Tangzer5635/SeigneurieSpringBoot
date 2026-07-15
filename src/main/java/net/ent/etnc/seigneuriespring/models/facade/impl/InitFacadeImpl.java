@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +42,9 @@ public class InitFacadeImpl implements InitFacade {
 
     @NonNull
     private final BatimentService batimentService;
+
+    @NonNull
+    private final SeigneurieEnvService seigneurieEnvService;
 
     @Override
     @Transactional(rollbackOn = Exception.class)
@@ -66,7 +68,7 @@ public class InitFacadeImpl implements InitFacade {
      * Charge un fichier CSV depuis les ressources
      */
     private List<String> chargementFichier(String path) throws IOException, URISyntaxException {
-        Path pathFichier = Path.of(Objects.requireNonNull(FacadeMetier.class.getResource(path)).toURI());
+        Path pathFichier = Path.of(Objects.requireNonNull(InitFacade.class.getResource(path)).toURI());
         List<String> lignes = Files.readAllLines(pathFichier);
         if (!lignes.isEmpty()) {
             lignes.removeFirst(); // Supprimer l'en-tête
@@ -127,10 +129,7 @@ public class InitFacadeImpl implements InitFacade {
         List<String> lignes = chargementFichier("/csv/batiment.csv");
         for (String line : lignes) {
             String[] data = line.split(";");
-            Optional<Seigneurie> seigneurie = seigneurieService.findByIdFetchBatiment(Long.parseLong(data[5]));
-            if (seigneurie.isEmpty()) {
-                throw new FacadeMetierException("La Seigneurie n'existe pas");
-            }
+            Seigneurie seigneurie = seigneurieService.findByIdFetchBatiment(Long.parseLong(data[5]));
 
             Batiment batiment = EntitiesFactory.creerBatiment(
                     data[2],
@@ -138,8 +137,8 @@ public class InitFacadeImpl implements InitFacade {
                     TypeBat.valueOf(data[4]));
 
             batiment = batimentService.save(batiment);
-            seigneurie.get().addBatiment(batiment);
-            seigneurieService.save(seigneurie.get());
+            seigneurie.addBatiment(batiment);
+            seigneurieService.save(seigneurie);
         }
     }
 
@@ -147,14 +146,7 @@ public class InitFacadeImpl implements InitFacade {
         List<String> lignes = chargementFichier("/csv/seigneurie_evenement.csv");
         for (String line : lignes) {
             String[] data = line.split(";");
-            Optional<Seigneurie> optionalSeigneurie = seigneurieService.findByIdFetchEvenement(Long.parseLong(data[0]));
-            if (optionalSeigneurie.isEmpty()) {
-                throw new FacadeMetierException("La Seigneurie n'existe pas");
-            }
-
-            Evenement evenement = evenementService.findById(Long.parseLong(data[1]));
-            optionalSeigneurie.get().addEvenement(evenement);
-            seigneurieService.save(optionalSeigneurie.get());
+            this.seigneurieEnvService.creerEvenementSeigneurie(Long.parseLong(data[1]), Long.parseLong(data[0]));
         }
     }
 }
