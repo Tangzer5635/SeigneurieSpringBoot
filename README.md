@@ -4,23 +4,25 @@ Un projet Spring Boot d'application de gestion de seigneuries en environnement f
 
 ## 📋 Vue d'ensemble
 
-**SeigneurieSpring** est une application Back-End développée avec Spring Boot et PostgreSQL. Elle suit une architecture en couches avec des services CRUD génériques, des facades métier, et une initialisation de données via CSV.
+**SeigneurieSpring** est une application Back-End développée avec Spring Boot et PostgreSQL. Elle suit une architecture en couches avec des services CRUD génériques, des façades métier, une initialisation de données via **Spring Batch**, et une interface en ligne de commande via **Spring Shell**.
 
 ### Contexte métier
 
 L'application simule la gestion d'une seigneurie médiévale avec :
-- **Seigneuries** : Les domaines principaux
-- **Habitants** : La population (avec statut : Noble, Paysan, Commerçant, etc.)
-- **Bâtiments** : Les infrastructures (type : Château, Ferme, Taverne, etc.)
-- **Ressources** : Les biens économiques (type : Blé, Or, Bois, Fer, etc.)
-- **Événements** : Les actions qui surviennent dans la seigneurie
+- **Seigneuries** : Les domaines principaux, chacun rattaché à un habitant "seigneur"
+- **Habitants** : La population (statut : Seigneur, Clerc, Bourgeois, Paysan, etc.)
+- **Bâtiments** : Les infrastructures (type : Château, Ferme, Maison, Caserne, etc.)
+- **Ressources** : Les biens économiques (type : Bois, Pierre, Or, Nourriture, etc.)
+- **Événements** : Les actions qui surviennent dans la seigneurie (fêtes, guerres, famines...)
 
 ## 🛠 Stack technique
 
 | Composant | Version |
 |-----------|---------|
 | **Java** | 21 |
-| **Spring Boot** | 4.1.0 |
+| **Spring Boot** | 4.0.7 |
+| **Spring Batch** | ✓ (starter Spring Boot 4) |
+| **Spring Shell** | 3.4.1 |
 | **PostgreSQL** | Latest |
 | **Spring Data JPA** | ✓ |
 | **Lombok** | Latest |
@@ -32,9 +34,9 @@ L'application simule la gestion d'une seigneurie médiévale avec :
 - spring-boot-starter-validation
 - spring-boot-starter-data-jpa
 - spring-boot-devtools
+- spring-shell-starter
 - lombok
 - postgresql
-- spring-boot-starter-validation-test
 ```
 
 ## 📁 Architecture du projet
@@ -43,35 +45,51 @@ L'application simule la gestion d'une seigneurie médiévale avec :
 src/
 ├── main/
 │   ├── java/net/ent/etnc/seigneuriespring/
+│   │   ├── batchs/                      # Import des données via Spring Batch
+│   │   │   ├── InitialisationBatch.java # Job maître (enchaîne tous les steps)
+│   │   │   ├── habitant/                # Batch, LineCSV, Processor, ReaderConfig, FieldSetMapper
+│   │   │   ├── seigneurie/
+│   │   │   ├── batiment/
+│   │   │   ├── evenement/
+│   │   │   └── ressource/
+│   │   ├── shell/                       # Commandes Spring Shell (CLI interactive)
+│   │   │   ├── ChargementCommands.java  # commande `init`
+│   │   │   ├── HabitantCommands.java    # commande `h-list`
+│   │   │   ├── SeigneurieCommands.java  # commandes `s-list`, `s-renew`
+│   │   │   └── exceptions/
 │   │   ├── models/
-│   │   │   ├── entity/          # Entités JPA (@Entity, @Table)
+│   │   │   ├── entity/                  # Entités JPA (@Entity, @Table)
 │   │   │   │   ├── AbstractEntity.java
 │   │   │   │   ├── Seigneurie.java
 │   │   │   │   ├── Habitant.java
 │   │   │   │   ├── Batiment.java
 │   │   │   │   ├── Ressource.java
-│   │   │   │   └── Evenement.java
-│   │   │   ├── repositories/    # Spring Data JPA repositories
-│   │   │   ├── services/        # Couche métier
-│   │   │   │   ├── commun/      # Services CRUD génériques
-│   │   │   │   └── crud/        # Services spécifiques par entité
-│   │   │   ├── facade/          # Façades (niveau application)
-│   │   │   │   ├── dto/         # Data Transfer Objects
-│   │   │   │   └── impl/        # Implémentations des façades
-│   │   │   └── referencies/     # Énumérations et constantes
-│   │   ├── init/
-│   │   │   └── jeuxDonnee.java  # Initialisation des données
+│   │   │   │   ├── Evenement.java
+│   │   │   │   ├── EntitiesFactory.java # Factory de création avec validation
+│   │   │   │   ├── vobjects/            # Value Objects (Nom, Prenom)
+│   │   │   │   └── communs/             # ValidUtils, exceptions de validation
+│   │   │   ├── repositories/            # Spring Data JPA repositories
+│   │   │   ├── services/                # Couche métier
+│   │   │   │   ├── commun/              # CRUDService / CRUDServiceImpl génériques
+│   │   │   │   └── crud/                # Services spécifiques par entité
+│   │   │   ├── facade/                  # Façades (niveau application)
+│   │   │   │   ├── dto/                 # Data Transfer Objects
+│   │   │   │   ├── exception/
+│   │   │   │   └── impl/                # Implémentations des façades
+│   │   │   └── referencies/             # Énumérations et constantes métier
 │   │   └── SeigneurieSpringApplication.java
 │   │
 │   └── resources/
-│       ├── application.yaml      # Configuration Spring
-│       └── csv/                  # Données d'initialisation
+│       ├── application.yaml             # Configuration Spring
+│       └── csv/                         # Données d'initialisation (lues par les Readers Batch)
 │           ├── seigneurie.csv
 │           ├── habitant.csv
 │           ├── batiment.csv
 │           ├── ressource.csv
 │           ├── evenement.csv
-│           └── relations
+│           ├── seigneurie_habitant.csv
+│           ├── seigneurie_ressource.csv
+│           └── seigneurie_evenement.csv
 └── test/
     └── java/net/ent/etnc/seigneuriespring/
         └── SeigneurieSpringApplicationTests.java
@@ -80,25 +98,36 @@ src/
 ## 🏗️ Architecture en couches
 
 ```
-┌─────────────────────────────┐
-│  Façade (Métier)            │
-│ (InitFacade, Etc...)        │
-└──────────────┬──────────────┘
+┌──────────────────────────────┐
+│  Shell (CLI interactive)      │
+│  (ChargementCommands, etc.)   │
+└──────────────┬────────────────┘
                │
-┌──────────────▼──────────────┐
-│  Services CRUD              │
-│ (CRUDService générique)     │
-└──────────────┬──────────────┘
+┌──────────────▼────────────────┐
+│  Façade (Métier)               │
+│  (SeigneurieFacade, etc.)      │
+└──────────────┬────────────────┘
                │
-┌──────────────▼──────────────┐
-│  Repositories               │
-│ (Spring Data JPA)           │
-└──────────────┬──────────────┘
+┌──────────────▼────────────────┐
+│  Services CRUD                 │
+│  (CRUDService générique)       │
+└──────────────┬────────────────┘
                │
-┌──────────────▼──────────────┐
-│  Entités & Base de données  │
-│ (JPA/PostgreSQL)            │
-└─────────────────────────────┘
+┌──────────────▼────────────────┐
+│  Repositories                  │
+│  (Spring Data JPA)             │
+└──────────────┬────────────────┘
+               │
+┌──────────────▼────────────────┐
+│  Entités & Base de données     │
+│  (JPA/PostgreSQL)              │
+└────────────────────────────────┘
+
+┌────────────────────────────────┐
+│  Spring Batch (import CSV)      │
+│  Reader → Processor → Writer    │
+│  → alimente directement JPA     │
+└────────────────────────────────┘
 ```
 
 ## 🚀 Installation et démarrage
@@ -127,7 +156,7 @@ src/
    ```
 
 2. **Configurer la base de données**
-   
+
    Mettre à jour `src/main/resources/application.yaml` :
    ```yaml
    spring:
@@ -159,9 +188,62 @@ src/
    mvn spring-boot:run
    ```
 
-4. **Accéder à l'application**
+4. **Utiliser le shell interactif**
 
-   Une fois démarrée, les données CSV seront automatiquement importées et la base peuplée avec les données initiales.
+   Au démarrage, l'application ouvre un **shell Spring Shell**. La base démarre vide : c'est la commande `init` qui déclenche l'import des données CSV via Spring Batch.
+
+## 💾 Initialisation des données (Spring Batch)
+
+Contrairement aux versions précédentes du projet, **les données ne sont plus importées automatiquement au démarrage**. L'import est piloté par un job Spring Batch, déclenché manuellement depuis le shell :
+
+```
+shell:> init
+```
+
+Ce job (`initialisationJob`, défini dans `InitialisationBatch`) enchaîne les steps dans un ordre précis :
+
+```
+importHabitantStep → importSeigneurieStep → importBatimentStep → importEvenementStep → importRessourceStep
+```
+
+⚠️ **L'ordre est important** : `importSeigneurieStep` a besoin que les habitants soient déjà en base, car chaque seigneurie référence un habitant "seigneur" existant (lookup par `HabitantService.findById`).
+
+Chaque entité dispose de son propre module d'import dans `batchs/<entite>/`, structuré de façon identique :
+
+| Fichier | Rôle |
+|---|---|
+| `<Entite>LineCSV.java` | Record représentant une ligne CSV brute |
+| `FieldSetMapper<Entite>.java` | Parse chaque ligne du CSV vers le `LineCSV` |
+| `<Entite>Processor.java` | Transforme le `LineCSV` en entité JPA via `EntitiesFactory` |
+| `<Entite>ReaderConfig.java` | Configure le `FlatFileItemReader` (fichier, délimiteur, colonnes) |
+| `<Entite>Batch.java` | Déclare le `Step` et le `Job` (writer JPA, chunk size 10) |
+
+### Configuration requise
+
+L'auto-lancement de job au démarrage de Spring Batch est désactivé, puisque le lancement est piloté manuellement via le shell :
+
+```yaml
+spring:
+  batch:
+    job:
+      enabled: false
+```
+
+### Réinitialiser les données
+
+Si vous avez besoin de remettre à zéro :
+1. Supprimez la base de données (ou relancez avec `ddl-auto: create`)
+2. Redémarrez l'application
+3. Relancez `init` dans le shell
+
+## 💻 Commandes Shell disponibles
+
+| Commande | Description |
+|---|---|
+| `init` | Lance l'import complet des données CSV (job Spring Batch) |
+| `h-list` | Affiche tous les habitants |
+| `s-list` | Affiche toutes les seigneuries |
+| `s-renew -i <idSeigneurie>` | Déclenche le renouvellement de population d'une seigneurie |
 
 ## 📦 Construction et packaging
 
@@ -179,45 +261,36 @@ Le JAR généré se trouvera dans `target/seigneurieSpring-0.0.1-SNAPSHOT.jar`
 java -jar target/seigneurieSpring-0.0.1-SNAPSHOT.jar
 ```
 
-## 💾 Initialisation des données
-
-L'application initialise automatiquement les données via CSV au démarrage. Les fichiers CSV sont situés dans `src/main/resources/csv/` :
-
-- **seigneurie.csv** : Les seigneuries
-- **habitant.csv** : Les habitants
-- **batiment.csv** : Les bâtiments
-- **ressource.csv** : Les ressources
-- **evenement.csv** : Les événements
-- **seigneurie_habitant.csv** : Relations seigneurie-habitants
-- **seigneurie_ressource.csv** : Relations seigneurie-ressources
-- **seigneurie_evenement.csv** : Relations seigneurie-événements
-
-### Réinitialiser les données
-
-Si vous avez besoin de remettre à zéro :
-1. Supprimez la base de données
-2. Redémarrez l'application
-
 ## 🔑 Points clés de l'architecture
 
 ### Services génériques
 
-La classe **CRUDService<T, ID>** fournit des opérations standard :
-- `create(T entity)` - Créer une entité
-- `read(ID id)` - Lire une entité
-- `update(T entity)` - Mettre à jour
-- `delete(ID id)` - Supprimer
-- `findAll()` - Récupérer toutes les entités
+La classe abstraite **`CRUDServiceImpl<T, R>`** fournit des opérations standard, implémentées via `CRUDService<T>` :
+- `save(T entity)` — Créer / mettre à jour une entité
+- `findById(Long id)` — Lire une entité
+- `deleteById(Long id)` — Supprimer
+- `existsById(Long id)` — Vérifier l'existence
+- `isValid(T entity)` — Valider via Bean Validation
+- `getAll()` — Récupérer toutes les entités
+- `count()` — Compter les entités
 
-Chaque service spécifique (HabitantService, BatimentService, etc.) hérite de CRUDService et peut ajouter des méthodes métier spécifiques.
+Chaque service spécifique (`HabitantService`, `BatimentService`, etc.) hérite de `CRUDServiceImpl` et peut ajouter des méthodes métier spécifiques (ex. `existsByNom`, `findByIdFetchBatiment`).
+
+### Value Objects
+
+`Nom` et `Prenom` sont des Value Objects `@Embeddable`, validés à la construction, utilisés dans `Habitant`, `Batiment` et `Evenement`.
+
+### Factory centralisée
+
+`EntitiesFactory` centralise la création des entités avec validation systématique (`ValidUtils.validate(...)`), utilisée à la fois par les `Processor` Spring Batch et par les façades métier.
 
 ### Façades métier
 
-Les façades (SeigneurieFacade, HabitantFacade, etc.) orchestrent les appels aux services pour encapsuler la logique métier complexe.
+Les façades (`SeigneurieFacade`, `HabitantFacade`, etc.) orchestrent les appels aux services pour encapsuler la logique métier complexe (ex. renouvellement de population, échange de ressources entre seigneuries, migration d'habitants).
 
 ### DTO (Data Transfer Objects)
 
-Les DTO (ex: SeigneurieDTO, BatimentDTO) sont utilisés pour transformer les entités JPA avant transmission au client, permettant une séparation entre la représentation interne et externe.
+Les DTO (ex. `SeigneurieDTO`, `BatimentDTO`) découplent la représentation interne (entités JPA) des données manipulées par la couche façade/présentation.
 
 ## ⚙️ Configuration
 
@@ -236,6 +309,9 @@ spring:
     hibernate:
       ddl-auto: create          # create | update | validate | none
     show-sql: true              # Affiche les requêtes SQL
+  batch:
+    job:
+      enabled: false            # Empêche le lancement auto d'un job au démarrage
 ```
 
 ### Configuration adaptée à votre environnement
@@ -268,10 +344,11 @@ Voir la couverture de tests :
 
 - **Package naming** : `net.ent.etnc.seigneuriespring.*`
 - **Entities** : Classes annotées `@Entity`, noms au singulier
-- **Services** : Interface + classe Impl, noms en `-Service`
-- **Repositories** : Interfaces étendant JpaRepository
-- **DTOs** : Suffix `-DTO` pour les objets transfert
-- **Enums** : Package `referencies` pour énumérations métier
+- **Services** : Interface + classe `Impl`, noms en `-Service`
+- **Repositories** : Interfaces étendant `JpaRepository`
+- **DTOs** : Suffix `-DTO` pour les objets de transfert
+- **Batch** : Un sous-package par entité dans `batchs/`, avec 5 classes nommées de façon identique (`LineCSV`, `FieldSetMapper`, `Processor`, `ReaderConfig`, `Batch`)
+- **Enums** : Package `referencies` pour les énumérations métier
 
 ## 🔍 Troubleshooting
 
@@ -297,6 +374,12 @@ sudo systemctl start postgresql
 # Modifier le port dans application.yaml
 url: jdbc:postgresql://localhost:5433/db_seigneurie
 ```
+
+### `Job name must be specified in case of multiple jobs`
+
+**Cause** : plusieurs `@Bean Job` sont définis (un par entité + le job maître), et Spring Boot essaie d'en lancer un automatiquement au démarrage.
+
+**Solution** : désactiver l'auto-lancement dans `application.yaml` (voir section Configuration) et piloter les jobs manuellement via la commande shell `init`.
 
 ### Build échoue avec des erreurs Lombok
 
@@ -335,12 +418,14 @@ chore:    Tâches de maintenance
 ## 🔗 Ressources utiles
 
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
+- [Spring Batch Documentation](https://spring.io/projects/spring-batch)
+- [Spring Shell Documentation](https://spring.io/projects/spring-shell)
 - [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [Lombok Documentation](https://projectlombok.org/)
 
 ## 📌 Version actuelle
 
-**Version** : 0.0.1-SNAPSHOT  
-**Statut** : En développement  
+**Version** : 0.0.1-SNAPSHOT
+**Statut** : En développement
 **Date** : Juillet 2026
