@@ -6,6 +6,10 @@ spring:
     interactive:
       enabled: true
 
+  batch:
+    job:
+      enabled: false
+
 
   datasource:
     url: jdbc:postgresql://localhost:5432/db_seigneurie

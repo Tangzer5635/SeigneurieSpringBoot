@@ -7,7 +7,7 @@ import net.ent.etnc.seigneuriespring.models.services.crud.BatimentService;
 import org.springframework.stereotype.Service;
 
 @Service
-class BatimentServiceImpl extends CRUDServiceImpl<Batiment, BatimentRepository> implements BatimentService {
+public class BatimentServiceImpl extends CRUDServiceImpl<Batiment, BatimentRepository> implements BatimentService {
 
     public BatimentServiceImpl(BatimentRepository batimentRepository) {
         this.monrepo = batimentRepository;

@@ -38,6 +38,11 @@ public class Habitant extends AbstractEntity {
     @Setter(AccessLevel.PROTECTED)
     @NotNull(message = "Le statut ne peut pas etre vide")
     @Enumerated(value = EnumType.STRING)
-    @Column(name = "statue", nullable = false, length = 15)
+    @Column(name = "statut", nullable = false, length = 15)
     private StatutHabitant statut;
+
+    @Getter
+    @Setter(AccessLevel.PROTECTED)
+    @Column(name = "seigneurie_id", nullable = true)
+    private Long seigneurieId;
 }
