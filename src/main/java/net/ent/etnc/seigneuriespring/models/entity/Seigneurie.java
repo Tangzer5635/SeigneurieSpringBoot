@@ -23,7 +23,7 @@ public class Seigneurie extends AbstractEntity {
             joinColumns = @JoinColumn(name = "seigneurie_id", foreignKey = @ForeignKey(name = "fk___seigneurie_ressource___seigneurie_id")))
     @MapKeyJoinColumn(name = "ressource_id", foreignKey = @ForeignKey(name = "fk___seigneurie_ressource___ressource_id"))
     @Column(name = "quantite", nullable = false)
-    private final Map<Ressource, Integer> ressources = new HashMap<>();
+    private Map<Ressource, Integer> ressources = new HashMap<>();
 
 
     @Getter

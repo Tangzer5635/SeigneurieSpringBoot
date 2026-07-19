@@ -9,9 +9,15 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 @ShellComponent
 @RequiredArgsConstructor
 public class SeigneurieCommands {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.FRENCH);
+
+
     @NonNull
     private final SeigneurieFacade seigneurieFacade;
 
@@ -19,7 +25,21 @@ public class SeigneurieCommands {
     public void afficherSeigneuries() {
         try {
             this.seigneurieFacade.recupererToutesLesSeigneuries()
-                    .forEach(System.out::println);
+                    .forEach(seigneurie -> {
+                        System.out.printf("""
+                    ┌────────────────────────────────────────────
+                    │ Nom        : %s
+                    │ Seigneur   : %s %s
+                    │ Né le      : %s
+                    └────────────────────────────────────────────
+                    
+                    """,
+                                seigneurie.getNom(),
+                                seigneurie.getSeigneur().getNom().nom(),
+                                seigneurie.getSeigneur().getPrenom().prenom(),
+                                seigneurie.getSeigneur().getDateNaissance().format(formatter)
+                        );
+                    });
         } catch (FacadeMetierException e) {
             throw new ShellException(e.getMessage());
         }
