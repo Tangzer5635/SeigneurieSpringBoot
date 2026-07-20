@@ -15,11 +15,9 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class HabitantCommands {
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.FRENCH);
-
-
     @NonNull
     private final HabitantFacade habitantFacade;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.FRENCH);
 
     @ShellMethod(key = "h-list", value = "Affiche tous les habitants")
     public void afficherHabitants() {
@@ -27,11 +25,12 @@ public class HabitantCommands {
             habitantFacade.recupererLesHabitants()
                     .forEach(habitant -> {
                         System.out.printf("""
-                                        ┌──────────────────────────────
-                                        │ Nom     : %s %s
-                                        │ Né le   : %s
-                                        │ Statut  : %s
-                                        └──────────────────────────────
+                                        ┌──────────────────────────────────────┐
+                                        │ Nom     : %-25s  │
+                                        │ Prénom  : %-25s  │
+                                        │ Né le   : %-25s  │
+                                        │ Statut  : %-25s  │
+                                        └──────────────────────────────────────┘
                                         
                                         """,
                                 habitant.getNom().nom(),

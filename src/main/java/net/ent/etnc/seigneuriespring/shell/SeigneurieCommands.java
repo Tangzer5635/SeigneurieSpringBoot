@@ -15,11 +15,9 @@ import java.util.Locale;
 @ShellComponent
 @RequiredArgsConstructor
 public class SeigneurieCommands {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.FRENCH);
-
-
     @NonNull
     private final SeigneurieFacade seigneurieFacade;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.FRENCH);
 
     @ShellMethod(key = "s-list", value = "Affiche toutes les seigneuries")
     public void afficherSeigneuries() {
@@ -27,16 +25,15 @@ public class SeigneurieCommands {
             this.seigneurieFacade.recupererToutesLesSeigneuries()
                     .forEach(seigneurie -> {
                         System.out.printf("""
-                    ┌────────────────────────────────────────────
-                    │ Nom        : %s
-                    │ Seigneur   : %s %s
-                    │ Né le      : %s
-                    └────────────────────────────────────────────
-                    
-                    """,
+                                        ┌────────────────────────────────────────────────────────┐
+                                        │ Nom        : %-41s │
+                                        │ Seigneur   : %-41s │
+                                        │ Né le      : %-41s │
+                                        └────────────────────────────────────────────────────────┘
+                                        
+                                        """,
                                 seigneurie.getNom(),
-                                seigneurie.getSeigneur().getNom().nom(),
-                                seigneurie.getSeigneur().getPrenom().prenom(),
+                                seigneurie.getSeigneur().getNom().nom() + " " + seigneurie.getSeigneur().getPrenom().prenom(),
                                 seigneurie.getSeigneur().getDateNaissance().format(formatter)
                         );
                     });
@@ -56,5 +53,5 @@ public class SeigneurieCommands {
         }
     }
 
-    
+
 }
